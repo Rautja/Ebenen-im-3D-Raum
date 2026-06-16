@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wissensspeicher · Ebenen im Raum · GK Mathematik Q1</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface2: #eef1f8;
+    --border: #d4daea;
+    --accent: #3a5fd9;
+    --accent2: #7c5cbf;
+    --accent3: #0fa86a;
+    --accent4: #d96d1a;
+    --accent5: #c2306e;
+    --text: #1a1f33;
+    --text-muted: #4a5270;
+    --text-dim: #9aa0b8;
+    --glow: rgba(58,95,217,0.08);
+    --glow2: rgba(124,92,191,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(108,143,255,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(52,211,153,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 3.5rem 2rem 2.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(58,95,217,0.05) 0%, transparent 100%);
+  }
+
+  .header-label {
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(108,143,255,0.1);
+    border: 1px solid rgba(108,143,255,0.25);
+    padding: 0.35em 1em;
+    border-radius: 100px;
+    margin-bottom: 1.2rem;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  header h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 0.75rem;
+  }
+
+  /* ─── NAV PILLS ─── */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(244,246,251,0.95);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-bar::-webkit-scrollbar { display: none; }
+
+  .nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.4em 1em;
+    border-radius: 100px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .nav-pill:hover, .nav-pill.active {
+    background: rgba(108,143,255,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    z-index: 200;
+    background: transparent;
+  }
+  #progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.1s;
+    border-radius: 0 2px 2px 0;
+    box-shadow: 0 0 6px rgba(58,95,217,0.3);
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+    box-shadow: 0 2px 12px rgba(58,95,217,0.06);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.2s; }
+  .section:nth-child(5) { animation-delay: 0.25s; }
+  .section:nth-child(6) { animation-delay: 0.3s; }
+  .section:nth-child(7) { animation-delay: 0.35s; }
+  .section:nth-child(8) { animation-delay: 0.4s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.4rem 1.8rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .section-header:hover { background: rgba(58,95,217,0.03); }
+
+  .section-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    flex: 1;
+  }
+
+  .section-title h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .section-title p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 0.1rem;
+  }
+
+  .section-chevron {
+    color: var(--text-dim);
+    transition: transform 0.3s ease;
+    font-size: 18px;
+  }
+
+  .section.open .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 1.8rem;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .section.open .section-body { display: block; }
+
+  /* ─── FORMULA BOXES ─── */
+  .formula-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+    font-family: 'Fraunces', serif;
+  }
+
+  .formula-box.green  { border-left-color: var(--accent3); }
+  .formula-box.purple { border-left-color: var(--accent2); }
+  .formula-box.orange { border-left-color: var(--accent4); }
+  .formula-box.pink   { border-left-color: var(--accent5); }
+
+  .formula-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .formula {
+    font-size: 1.05rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .formula .var { color: var(--accent); font-style: italic; }
+  .formula .var.green { color: var(--accent3); }
+  .formula .var.orange { color: var(--accent4); }
+  .formula .var.purple { color: var(--accent2); }
+
+  /* ─── INFO BOXES ─── */
+  .info-box {
+    background: rgba(108,143,255,0.06);
+    border: 1px solid rgba(108,143,255,0.2);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .info-box.tip {
+    background: rgba(52,211,153,0.06);
+    border-color: rgba(52,211,153,0.2);
+  }
+
+  .info-box.warning {
+    background: rgba(251,146,60,0.06);
+    border-color: rgba(251,146,60,0.2);
+  }
+
+  .info-box-title {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ─── COMPARISON GRID ─── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .compare-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .compare-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .compare-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  .compare-card p, .compare-card li {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .compare-card ul { padding-left: 1.2rem; }
+  .compare-card ul li { margin-bottom: 0.2rem; }
+
+  /* ─── STEPS ─── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .step-content {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .step-content strong { color: var(--text); }
+
+  /* ─── QUIZ ─── */
+  .quiz-section {
+    background: linear-gradient(135deg, rgba(108,143,255,0.05), rgba(167,139,250,0.05));
+    border: 1px solid rgba(108,143,255,0.2);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .quiz-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .quiz-question {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .quiz-option {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .quiz-option:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(108,143,255,0.08);
+  }
+
+  .quiz-option.correct {
+    background: rgba(52,211,153,0.1);
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  .quiz-option.wrong {
+    background: rgba(239,68,68,0.1);
+    border-color: #ef4444;
+    color: #ef4444;
+  }
+
+  .quiz-option.disabled { pointer-events: none; }
+
+  .option-letter {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .quiz-feedback {
+    margin-top: 0.75rem;
+    font-size: 13px;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    display: none;
+    line-height: 1.6;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(52,211,153,0.1); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+  .quiz-feedback.wrong { background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+  .quiz-reset {
+    margin-top: 0.75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+    transition: all 0.2s;
+  }
+  .quiz-reset.show { display: inline-block; }
+  .quiz-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── PROGRESS TRACKER ─── */
+  .progress-tracker {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 0.5rem;
+    animation: fadeUp 0.3s ease both;
+    box-shadow: 0 2px 12px rgba(58,95,217,0.06);
+  }
+
+  .tracker-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  .check-item:hover { background: rgba(58,95,217,0.04); }
+
+  .check-item input[type="checkbox"] { display: none; }
+
+  .check-box {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    font-size: 11px;
+  }
+
+  .check-item.checked .check-box {
+    background: var(--accent3);
+    border-color: var(--accent3);
+    color: white;
+  }
+
+  .check-item.checked .check-text {
+    text-decoration: line-through;
+    color: var(--text-dim);
+  }
+
+  .tracker-bar-wrap {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 100px;
+    margin-top: 1.1rem;
+    overflow: hidden;
+  }
+
+  #tracker-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  .tracker-count {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+  }
+
+  /* ─── ACCORDION MINI ─── */
+  .mini-accord {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0.75rem 0;
+  }
+
+  .mini-accord-header {
+    padding: 0.85rem 1.1rem;
+    background: var(--surface2);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .mini-accord-header:hover { background: rgba(108,143,255,0.08); }
+
+  .mini-accord-body {
+    display: none;
+    padding: 1rem 1.1rem;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    background: #f8faff;
+    line-height: 1.7;
+  }
+
+  .mini-accord.open .mini-accord-body { display: block; }
+
+  /* ─── TAGS ─── */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.75rem 0;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.25em 0.75em;
+    border-radius: 100px;
+    background: rgba(108,143,255,0.1);
+    border: 1px solid rgba(108,143,255,0.2);
+    color: var(--accent);
+  }
+
+  .tag.green { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.2); color: var(--accent3); }
+  .tag.purple { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); color: var(--accent2); }
+  .tag.orange { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.2); color: var(--accent4); }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.2rem 0;
+  }
+
+  /* ─── TEXT UTILITIES ─── */
+  p { margin-bottom: 0.75rem; color: var(--text-muted); font-size: 14px; }
+  p:last-child { margin-bottom: 0; }
+  strong { color: var(--text); font-weight: 600; }
+  h3 { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--text); margin: 1.2rem 0 0.5rem; }
+  h3:first-child { margin-top: 0; }
+
+  ul, ol { padding-left: 1.4rem; margin: 0.5rem 0 0.75rem; }
+  li { font-size: 14px; color: var(--text-muted); margin-bottom: 0.3rem; line-height: 1.6; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    main { padding: 1.5rem 1rem 4rem; }
+    .section-body { padding: 1.25rem; }
+    .section-header { padding: 1.1rem 1.25rem; }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  .section { opacity: 0; transform: translateY(24px); }
+  .section.visible { animation: fadeUp 0.5s ease both; opacity: 1; }
+
+  /* ─── SPECIAL: 3D VIZ ─── */
+  .canvas-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    max-height: 260px;
+    cursor: grab;
+  }
+
+  canvas:active { cursor: grabbing; }
+
+  .canvas-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-label">GK Mathematik · Q1 · 2. Halbjahr</div>
+  <h1>Wissensspeicher<br><span>Ebenen im Raum</span></h1>
+  <p>Analytische Geometrie & Lineare Algebra · Grundkurs</p>
+</header>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a class="nav-pill active" href="#overview">📋 Überblick</a>
+  <a class="nav-pill" href="#parameterform">📐 Parameterform</a>
+  <a class="nav-pill" href="#koordinatenform">🔢 Koordinatenform</a>
+  <a class="nav-pill" href="#normalenvektor">⬆ Normalenvektor</a>
+  <a class="nav-pill" href="#lagebeziehungen">🔗 Lagebeziehungen</a>
+  <a class="nav-pill" href="#schnittwinkel">📏 Schnittwinkel</a>
+  <a class="nav-pill" href="#quiz">✅ Selbsttest</a>
+  <a class="nav-pill" href="#kompetenzen">🎯 Kompetenzen</a>
+</nav>
+
+<main>
+
+  <!-- ─── PROGRESS TRACKER ─── -->
+  <div class="progress-tracker" id="overview">
+    <div class="tracker-title">🎯 Mein Lernfortschritt</div>
+    <div class="checklist" id="checklist">
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann eine Ebenengleichung in Parameterform aufstellen</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kenne den Unterschied zwischen Parameter- und Koordinatenform</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann den Normalenvektor einer Ebene bestimmen</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann eine Ebene in Koordinatenform aufstellen</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann eine Punktprobe für Ebenen durchführen</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann den Schnittpunkt einer Geraden mit einer Ebene berechnen</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann Lagebeziehungen von Geraden und Ebenen untersuchen</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <div class="check-box">✓</div>
+        <span class="check-text">Ich kann den Schnittwinkel zweier sich schneidender Objekte berechnen</span>
+      </label>
+    </div>
+    <div class="tracker-bar-wrap"><div id="tracker-fill"></div></div>
+    <div class="tracker-count" id="tracker-count">0 von 8 Kompetenzen abgehakt</div>
+  </div>
+
+  <!-- ─── 1. ÜBERBLICK ─── -->
+  <div class="section open" id="s-overview">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(108,143,255,0.1)">🗺️</div>
+      <div class="section-title">
+        <h2>Was sind Ebenen im Raum?</h2>
+        <p>Grundidee und Anschauung</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+      <p>Eine <strong>Ebene</strong> ist ein flächiges, unendlich ausgedehntes Objekt im dreidimensionalen Raum – wie ein unendlich großes, flaches Blatt Papier.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3>📍 Gerade (zur Erinnerung)</h3>
+          <p>Durch einen Punkt in einer Richtung – beschrieben durch <strong>1 Richtungsvektor</strong></p>
+        </div>
+        <div class="compare-card">
+          <h3>🗺️ Ebene (neu!)</h3>
+          <p>Durch einen Punkt in <strong>zwei unabhängige Richtungen</strong> – braucht <strong>2 Richtungsvektoren</strong></p>
+        </div>
+      </div>
+
+      <div class="info-box tip">
+        <div class="info-box-title">💡 Anschauung</div>
+        Stell dir vor, du stehst auf dem Boden (einer Ebene). Du kannst vorwärts/rückwärts (1. Richtung) UND links/rechts (2. Richtung) gehen – aber nicht hoch/runter. Das sind deine beiden Richtungsvektoren!
+      </div>
+
+      <h3>Wozu brauche ich das?</h3>
+      <div class="tags">
+        <span class="tag">Architektur</span>
+        <span class="tag green">Luft- &amp; Raumfahrt</span>
+        <span class="tag purple">Computergrafik</span>
+        <span class="tag orange">Navigation</span>
+      </div>
+      <p>Ebenen beschreiben Flächen von Gebäuden, Flugzeugbahnen, 3D-Grafiken und Navigationssysteme – überall im Alltag!</p>
+    </div>
+  </div>
+
+  <!-- ─── 2. PARAMETERFORM ─── -->
+  <div class="section" id="parameterform">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(108,143,255,0.1)">📐</div>
+      <div class="section-title">
+        <h2>Parameterform der Ebene</h2>
+        <p>Aufstellung und Bedeutung</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <div class="formula-box">
+        <div class="formula-label">Parameterform</div>
+        <div class="formula">
+          E : <span class="var">x⃗</span> = <span class="var green">p⃗</span> + <span class="var orange">s</span> · <span class="var">u⃗</span> + <span class="var orange">t</span> · <span class="var">v⃗</span> &nbsp;&nbsp;&nbsp; (<span class="var orange">s</span>, <span class="var orange">t</span> ∈ ℝ)
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3 style="color:var(--accent3)">p⃗ – Stützvektor</h3>
+          <p>Ein <strong>Punkt</strong> der Ebene (Ortsvektor). Er „stützt" die Ebene an einer festen Stelle im Raum.</p>
+        </div>
+        <div class="compare-card">
+          <h3 style="color:var(--accent)">u⃗, v⃗ – Richtungsvektoren</h3>
+          <p>Zwei <strong>linear unabhängige</strong> Vektoren, die in der Ebene liegen. Sie dürfen <strong>nicht kollinear</strong> sein!</p>
+        </div>
+        <div class="compare-card">
+          <h3 style="color:var(--accent4)">s, t – Parameter</h3>
+          <p>Freie <strong>reelle Zahlen</strong>. Durch alle Kombinationen von s und t erhält man jeden Punkt der Ebene.</p>
+        </div>
+      </div>
+
+      <h3>Ebene aus 3 Punkten aufstellen</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content"><strong>Stützvektor wählen:</strong> Einen der drei Punkte als Stützvektor p⃗ nehmen (z.B. Punkt A).</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content"><strong>Richtungsvektoren berechnen:</strong> u⃗ = B⃗ − A⃗ und v⃗ = C⃗ − A⃗</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content"><strong>Einsetzen:</strong> E : x⃗ = A⃗ + s · (B⃗ − A⃗) + t · (C⃗ − A⃗)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content"><strong>Kollinearität prüfen:</strong> u⃗ und v⃗ dürfen kein Vielfaches voneinander sein!</div>
+        </div>
+      </div>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          📘 Beispiel: Ebene durch A(1|0|2), B(3|1|0), C(0|2|1) <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          <strong>Stützvektor:</strong> p⃗ = (1, 0, 2)ᵀ<br><br>
+          <strong>Richtungsvektoren:</strong><br>
+          u⃗ = B − A = (3−1, 1−0, 0−2)ᵀ = (2, 1, −2)ᵀ<br>
+          v⃗ = C − A = (0−1, 2−0, 1−2)ᵀ = (−1, 2, −1)ᵀ<br><br>
+          <strong>Ergebnis:</strong><br>
+          E : x⃗ = (1, 0, 2)ᵀ + s·(2, 1, −2)ᵀ + t·(−1, 2, −1)ᵀ
+        </div>
+      </div>
+
+      <div class="info-box warning">
+        <div class="info-box-title">⚠️ Achtung: Kollinearität</div>
+        Wenn u⃗ = k · v⃗ für eine reelle Zahl k gilt, liegen beide Vektoren in dieselbe Richtung → keine Ebene, sondern nur eine Gerade! Immer prüfen!
+      </div>
+
+      <h3>Punktprobe</h3>
+      <p>Um zu prüfen, ob ein Punkt P auf der Ebene liegt, setzt du P in die Parameterform ein und prüfst, ob das Gleichungssystem nach s und t lösbar ist.</p>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          📘 Punktprobe – Schritt für Schritt <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          Gegeben: E : x⃗ = (1,0,2)ᵀ + s·(2,1,−2)ᵀ + t·(−1,2,−1)ᵀ<br>
+          Frage: Liegt P(5|4|−2) auf E?<br><br>
+          Ansatz: (5,4,−2)ᵀ = (1,0,2)ᵀ + s·(2,1,−2)ᵀ + t·(−1,2,−1)ᵀ<br><br>
+          LGS aufstellen:<br>
+          I: &nbsp; 1 + 2s − t = 5<br>
+          II: &nbsp; s + 2t = 4<br>
+          III: 2 − 2s − t = −2<br><br>
+          Aus I: 2s − t = 4<br>
+          Aus II: s + 2t = 4 → s = 4 − 2t einsetzen …<br>
+          Lösung: s = 2, t = 1 ✓ (alle drei Gleichungen erfüllt)<br>
+          → <strong>P liegt auf E.</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 3. NORMALENVEKTOR ─── -->
+  <div class="section" id="normalenvektor">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(167,139,250,0.1)">⬆</div>
+      <div class="section-title">
+        <h2>Der Normalenvektor</h2>
+        <p>Senkrecht zur Ebene – der Schlüssel zur Koordinatenform</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <p>Der <strong>Normalenvektor n⃗</strong> steht <strong>senkrecht auf der gesamten Ebene</strong> – also senkrecht auf jedem Vektor, der in der Ebene liegt.</p>
+
+      <div class="formula-box purple">
+        <div class="formula-label">Eigenschaft des Normalenvektors</div>
+        <div class="formula">
+          <span class="var purple">n⃗</span> · <span class="var">u⃗</span> = 0 &nbsp;&nbsp; und &nbsp;&nbsp; <span class="var purple">n⃗</span> · <span class="var">v⃗</span> = 0
+        </div>
+      </div>
+
+      <div class="info-box tip">
+        <div class="info-box-title">💡 Anschauung</div>
+        Wenn du ein Blatt Papier flach hinlegst und einen Stift senkrecht daraufstellst – das ist dein Normalenvektor!
+      </div>
+
+      <h3>Normalenvektor berechnen – das Kreuzprodukt</h3>
+      <p>Gegeben sind die Richtungsvektoren u⃗ = (u₁, u₂, u₃)ᵀ und v⃗ = (v₁, v₂, v₃)ᵀ.</p>
+
+      <div class="formula-box purple">
+        <div class="formula-label">Kreuzprodukt (Vektorprodukt)</div>
+        <div class="formula">
+          <span class="var purple">n⃗</span> = <span class="var">u⃗</span> × <span class="var">v⃗</span> =
+          <table style="display:inline-table; border-collapse:collapse; vertical-align:middle; margin: 0 0.5rem;">
+            <tr>
+              <td style="padding:0 0.3rem; color:var(--accent)">u₂v₃ − u₃v₂</td>
+            </tr>
+            <tr>
+              <td style="padding:0 0.3rem; color:var(--accent)">u₃v₁ − u₁v₃</td>
+            </tr>
+            <tr>
+              <td style="padding:0 0.3rem; color:var(--accent)">u₁v₂ − u₂v₁</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          🧮 Gedächtnisstütze: Kreuzprodukt mit dem Sarrus-Schema <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          Schreibe die Vektoren nebeneinander und streiche die jeweilige Zeile:<br><br>
+          n₁ = u₂·v₃ − u₃·v₂ &nbsp;&nbsp;→ <em>„Zeile 1 streichen, Kreuz bilden"</em><br>
+          n₂ = u₃·v₁ − u₁·v₃ &nbsp;&nbsp;→ <em>„Zeile 2 streichen"</em><br>
+          n₃ = u₁·v₂ − u₂·v₁ &nbsp;&nbsp;→ <em>„Zeile 3 streichen"</em><br><br>
+          <strong>Merkhilfe:</strong> Jede Komponente entsteht aus den anderen zwei Zeilen – Hauptdiagonale minus Nebendiagonale.
+        </div>
+      </div>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          📘 Beispiel: n⃗ für u⃗ = (2,1,−2)ᵀ, v⃗ = (−1,2,−1)ᵀ <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          n₁ = (1)·(−1) − (−2)·(2) = −1 + 4 = <strong>3</strong><br>
+          n₂ = (−2)·(−1) − (2)·(−1) = 2 + 2 = <strong>4</strong><br>
+          n₃ = (2)·(2) − (1)·(−1) = 4 + 1 = <strong>5</strong><br><br>
+          → n⃗ = (3, 4, 5)ᵀ<br><br>
+          <strong>Probe:</strong> n⃗ · u⃗ = 3·2 + 4·1 + 5·(−2) = 6 + 4 − 10 = 0 ✓
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 4. KOORDINATENFORM ─── -->
+  <div class="section" id="koordinatenform">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(52,211,153,0.1)">🔢</div>
+      <div class="section-title">
+        <h2>Koordinatenform der Ebene</h2>
+        <p>ax + by + cz = d</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <div class="formula-box green">
+        <div class="formula-label">Koordinatenform</div>
+        <div class="formula">
+          E : <span class="var green">a</span>x₁ + <span class="var green">b</span>x₂ + <span class="var green">c</span>x₃ = <span class="var orange">d</span>
+        </div>
+      </div>
+
+      <p>Die Koeffizienten (a, b, c) sind genau die Komponenten des <strong>Normalenvektors</strong> n⃗ = (a, b, c)ᵀ!</p>
+
+      <h3>Von der Parameterform zur Koordinatenform</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content"><strong>Normalenvektor berechnen:</strong> n⃗ = u⃗ × v⃗</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content"><strong>Gleichung ansetzen:</strong> ax₁ + bx₂ + cx₃ = d, wobei (a,b,c) = n⃗</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content"><strong>d berechnen:</strong> Stützpunkt p⃗ einsetzen: d = a·p₁ + b·p₂ + c·p₃</div>
+        </div>
+      </div>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          📘 Vollständiges Beispiel: Parameterform → Koordinatenform <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          <strong>Parameterform:</strong><br>
+          E : x⃗ = (1,0,2)ᵀ + s·(2,1,−2)ᵀ + t·(−1,2,−1)ᵀ<br><br>
+          <strong>Normalenvektor (s.o.):</strong> n⃗ = (3, 4, 5)ᵀ<br><br>
+          <strong>d berechnen</strong> (Stützpunkt (1,0,2) einsetzen):<br>
+          d = 3·1 + 4·0 + 5·2 = 3 + 0 + 10 = 13<br><br>
+          <strong>Koordinatenform:</strong><br>
+          E : 3x₁ + 4x₂ + 5x₃ = 13 ✓
+        </div>
+      </div>
+
+      <h3>Nützliche Anwendungen der Koordinatenform</h3>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3>🔍 Punktprobe</h3>
+          <p>Punkt P(p₁|p₂|p₃) in ax₁+bx₂+cx₃=d einsetzen.<br>Gilt Gleichheit → P liegt auf E.</p>
+        </div>
+        <div class="compare-card">
+          <h3>✂️ Achsenschnittpunkte</h3>
+          <p>x₁-Achse: x₂=x₃=0 → x₁ = d/a<br>
+          x₂-Achse: x₁=x₃=0 → x₂ = d/b<br>
+          x₃-Achse: x₁=x₂=0 → x₃ = d/c</p>
+        </div>
+        <div class="compare-card">
+          <h3>⬆ Normalenvektor ablesen</h3>
+          <p>Aus ax₁+bx₂+cx₃=d lässt sich der Normalenvektor n⃗ = (a,b,c)ᵀ direkt ablesen!</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">📐 Spezialebenen</div>
+        <strong>x₁-x₂-Ebene (Bodenebene):</strong> x₃ = 0, also n⃗ = (0,0,1)ᵀ<br>
+        <strong>x₁-x₃-Ebene:</strong> x₂ = 0, also n⃗ = (0,1,0)ᵀ<br>
+        <strong>x₂-x₃-Ebene:</strong> x₁ = 0, also n⃗ = (1,0,0)ᵀ
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 5. LAGEBEZIEHUNGEN ─── -->
+  <div class="section" id="lagebeziehungen">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,146,60,0.1)">🔗</div>
+      <div class="section-title">
+        <h2>Lagebeziehungen</h2>
+        <p>Gerade–Ebene &amp; Ebene–Ebene</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <h3>Gerade und Ebene</h3>
+      <p>Eine Gerade g : x⃗ = a⃗ + r·b⃗ und eine Ebene E : n₁x₁ + n₂x₂ + n₃x₃ = d können drei Lagebeziehungen haben:</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3 style="color:var(--accent3)">✂️ Schneidend</h3>
+          <p>g schneidet E in <strong>genau einem Punkt</strong>.<br><br>
+          <em>Bedingung:</em> b⃗ · n⃗ ≠ 0<br>
+          (Richtungsvektor nicht ⊥ zum Normalenvektor)</p>
+        </div>
+        <div class="compare-card">
+          <h3 style="color:var(--accent4)">∥ Parallel</h3>
+          <p>g liegt <strong>nicht</strong> in E, hat aber <strong>keinen Schnittpunkt</strong>.<br><br>
+          <em>Bedingung:</em> b⃗ · n⃗ = 0, aber Stützpunkt nicht auf E</p>
+        </div>
+        <div class="compare-card">
+          <h3 style="color:var(--accent2)">⊂ In der Ebene</h3>
+          <p>g liegt <strong>vollständig</strong> in E.<br><br>
+          <em>Bedingung:</em> b⃗ · n⃗ = 0 und Stützpunkt liegt auf E</p>
+        </div>
+      </div>
+
+      <h3>Schnittpunkt Gerade–Ebene berechnen</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content"><strong>Geradengleichung in Koordinatenform einsetzen:</strong> Ersetze x₁, x₂, x₃ durch die Geradenkomponenten.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content"><strong>Nach r auflösen:</strong> Gleichung lösen → Parameterwert r.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content"><strong>r in Geraden einsetzen:</strong> Schnittpunkt S berechnen.</div>
+        </div>
+      </div>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          📘 Beispiel: Schnittpunkt g mit E <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          g : x⃗ = (1,2,0)ᵀ + r·(1,−1,3)ᵀ<br>
+          E : 3x₁ + 4x₂ + 5x₃ = 13<br><br>
+          <strong>Einsetzen:</strong><br>
+          3(1+r) + 4(2−r) + 5(3r) = 13<br>
+          3 + 3r + 8 − 4r + 15r = 13<br>
+          11 + 14r = 13<br>
+          r = 2/14 = 1/7<br><br>
+          <strong>Schnittpunkt:</strong><br>
+          S = (1 + 1/7, 2 − 1/7, 3/7) = (8/7 | 13/7 | 3/7)
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Zwei Ebenen</h3>
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3 style="color:var(--accent)">✂️ Schneidend</h3>
+          <p>Schnitt entlang einer <strong>Schnittgeraden</strong>.<br><em>n⃗₁ und n⃗₂ nicht kollinear</em></p>
+        </div>
+        <div class="compare-card">
+          <h3 style="color:var(--accent4)">∥ Parallel</h3>
+          <p>Kein gemeinsamer Punkt.<br><em>n⃗₁ = k · n⃗₂, aber E₁ ≠ E₂</em></p>
+        </div>
+        <div class="compare-card">
+          <h3 style="color:var(--accent2)">= Identisch</h3>
+          <p>Beide Ebenen sind dieselbe.<br><em>n⃗₁ = k · n⃗₂ und gleiche Ebene</em></p>
+        </div>
+      </div>
+
+      <div class="info-box tip">
+        <div class="info-box-title">💡 Schnelle Prüfung</div>
+        Sind die Normalenvektoren <strong>kollinear</strong>? → entweder parallel oder identisch. Dann prüfe, ob ein Punkt der einen Ebene auch die andere erfüllt.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 6. SCHNITTWINKEL ─── -->
+  <div class="section" id="schnittwinkel">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(244,114,182,0.1)">📏</div>
+      <div class="section-title">
+        <h2>Schnittwinkel</h2>
+        <p>Winkel zwischen Geraden und Ebenen</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <h3>Winkel zwischen zwei Ebenen</h3>
+      <p>Der Winkel zwischen zwei Ebenen entspricht dem Winkel zwischen ihren <strong>Normalenvektoren</strong>.</p>
+
+      <div class="formula-box pink">
+        <div class="formula-label">Winkel zwischen Ebene E₁ und E₂</div>
+        <div class="formula">
+          cos(α) = <span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle">
+            <span>|<span class="var purple">n⃗₁</span> · <span class="var purple">n⃗₂</span>|</span>
+            <span style="border-top:1px solid var(--text-muted);padding-top:2px">|<span class="var purple">n⃗₁</span>| · |<span class="var purple">n⃗₂</span>|</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="info-box tip">
+        <div class="info-box-title">💡 Warum Betrag?</div>
+        Normalenvektoren können in beide Richtungen zeigen. Der Betrag im Zähler stellt sicher, dass wir immer den spitzen Winkel ≤ 90° erhalten.
+      </div>
+
+      <h3>Winkel zwischen Gerade und Ebene</h3>
+      <p>Der Winkel zwischen einer Geraden und einer Ebene ist das <strong>Komplement</strong> des Winkels zwischen Richtungsvektor und Normalenvektor.</p>
+
+      <div class="formula-box pink">
+        <div class="formula-label">Winkel zwischen Gerade g und Ebene E</div>
+        <div class="formula">
+          sin(β) = <span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle">
+            <span>|<span class="var">b⃗</span> · <span class="var purple">n⃗</span>|</span>
+            <span style="border-top:1px solid var(--text-muted);padding-top:2px">|<span class="var">b⃗</span>| · |<span class="var purple">n⃗</span>|</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3>Ebene–Ebene</h3>
+          <p>Formel mit <strong>cos</strong>, Winkel zwischen den <strong>Normalenvektoren</strong></p>
+        </div>
+        <div class="compare-card">
+          <h3>Gerade–Ebene</h3>
+          <p>Formel mit <strong>sin</strong>, Winkel zwischen <strong>Richtungsvektor</strong> und <strong>Normalenvektor</strong></p>
+        </div>
+        <div class="compare-card">
+          <h3>Gerade–Gerade</h3>
+          <p>Formel mit <strong>cos</strong>, Winkel zwischen den <strong>Richtungsvektoren</strong> (wie bekannt!)</p>
+        </div>
+      </div>
+
+      <div class="mini-accord">
+        <div class="mini-accord-header" onclick="toggleMini(this)">
+          📘 Beispiel: Winkel zwischen zwei Ebenen <span>▸</span>
+        </div>
+        <div class="mini-accord-body">
+          E₁ : 2x₁ + x₂ − x₃ = 5 &nbsp;→ n⃗₁ = (2, 1, −1)ᵀ<br>
+          E₂ : x₁ − 3x₂ + 2x₃ = 1 &nbsp;→ n⃗₂ = (1, −3, 2)ᵀ<br><br>
+          n⃗₁ · n⃗₂ = 2·1 + 1·(−3) + (−1)·2 = 2 − 3 − 2 = −3<br>
+          |n⃗₁| = √(4+1+1) = √6<br>
+          |n⃗₂| = √(1+9+4) = √14<br><br>
+          cos(α) = |−3| / (√6 · √14) = 3 / √84 ≈ 0,327<br>
+          α ≈ arccos(0,327) ≈ <strong>70,9°</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 7. SELBSTTEST ─── -->
+  <div class="section" id="quiz">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(52,211,153,0.1)">✅</div>
+      <div class="section-title">
+        <h2>Selbsttest</h2>
+        <p>Teste dein Verständnis – kannst du alle beantworten?</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <!-- QUIZ 1 -->
+      <div class="quiz-section">
+        <div class="quiz-title">❓ Frage 1</div>
+        <div class="quiz-question">Eine Ebene in Parameterform braucht mindestens …</div>
+        <div class="quiz-options" id="q1">
+          <button class="quiz-option" onclick="answer(this,'q1','wrong','Eine Gerade beschreibt 1D – zu wenig für eine Ebene!')">
+            <span class="option-letter">A</span> … einen Punkt und einen Richtungsvektor
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q1','correct','Genau! Ein Stützpunkt + zwei linear unabhängige Richtungsvektoren = Ebene.')">
+            <span class="option-letter">B</span> … einen Punkt und zwei linear unabhängige Richtungsvektoren
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q1','wrong','Drei Richtungsvektoren wären überbestimmt – einer wäre überflüssig.')">
+            <span class="option-letter">C</span> … einen Punkt und drei Richtungsvektoren
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q1','wrong','Stimmt nicht – man braucht auch einen Stützpunkt!')">
+            <span class="option-letter">D</span> … nur zwei Richtungsvektoren, keinen Punkt
+          </button>
+        </div>
+        <div class="quiz-feedback" id="q1-fb"></div>
+        <button class="quiz-reset" id="q1-reset" onclick="resetQuiz('q1')">↺ Nochmal versuchen</button>
+      </div>
+
+      <!-- QUIZ 2 -->
+      <div class="quiz-section">
+        <div class="quiz-title">❓ Frage 2</div>
+        <div class="quiz-question">Die Ebene E : 2x₁ − 3x₂ + x₃ = 7 hat den Normalenvektor …</div>
+        <div class="quiz-options" id="q2">
+          <button class="quiz-option" onclick="answer(this,'q2','wrong','Das ist kein Normalenvektor – der Wert 7 gehört zur rechten Seite der Gleichung.')">
+            <span class="option-letter">A</span> n⃗ = (2, −3, 7)ᵀ
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q2','correct','Richtig! Die Koeffizienten von x₁, x₂, x₃ bilden direkt den Normalenvektor.')">
+            <span class="option-letter">B</span> n⃗ = (2, −3, 1)ᵀ
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q2','wrong','Leider falsch – die Vorzeichen müssen aus der Gleichung übernommen werden.')">
+            <span class="option-letter">C</span> n⃗ = (−2, 3, −1)ᵀ
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q2','wrong','x₃ hat den Koeffizienten +1, nicht 0.')">
+            <span class="option-letter">D</span> n⃗ = (2, −3, 0)ᵀ
+          </button>
+        </div>
+        <div class="quiz-feedback" id="q2-fb"></div>
+        <button class="quiz-reset" id="q2-reset" onclick="resetQuiz('q2')">↺ Nochmal versuchen</button>
+      </div>
+
+      <!-- QUIZ 3 -->
+      <div class="quiz-section">
+        <div class="quiz-title">❓ Frage 3</div>
+        <div class="quiz-question">Eine Gerade g hat b⃗ · n⃗ = 0, und ihr Stützpunkt liegt NICHT auf der Ebene E. Was gilt?</div>
+        <div class="quiz-options" id="q3">
+          <button class="quiz-option" onclick="answer(this,'q3','wrong','Wenn b⃗ · n⃗ = 0, kann die Gerade keinen eindeutigen Schnittpunkt haben.')">
+            <span class="option-letter">A</span> g schneidet E in genau einem Punkt
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q3','correct','Genau! b⃗ ⊥ n⃗ bedeutet g verläuft parallel zur Ebene. Da der Stützpunkt nicht auf E liegt, gibt es keinen Schnittpunkt.')">
+            <span class="option-letter">B</span> g ist parallel zu E (kein Schnittpunkt)
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q3','wrong','Wenn der Stützpunkt nicht auf E liegt, kann g nicht in E liegen.')">
+            <span class="option-letter">C</span> g liegt vollständig in E
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q3','wrong','b⃗ · n⃗ = 0 gibt klare Information – keine Mehrdeutigkeit.')">
+            <span class="option-letter">D</span> Keine Aussage möglich
+          </button>
+        </div>
+        <div class="quiz-feedback" id="q3-fb"></div>
+        <button class="quiz-reset" id="q3-reset" onclick="resetQuiz('q3')">↺ Nochmal versuchen</button>
+      </div>
+
+      <!-- QUIZ 4 -->
+      <div class="quiz-section">
+        <div class="quiz-title">❓ Frage 4</div>
+        <div class="quiz-question">Welche Formel verwendet man für den Winkel zwischen einer Geraden und einer Ebene?</div>
+        <div class="quiz-options" id="q4">
+          <button class="quiz-option" onclick="answer(this,'q4','wrong','cos wird für Ebene–Ebene oder Gerade–Gerade verwendet.')">
+            <span class="option-letter">A</span> cos(α) = |b⃗ · n⃗| / (|b⃗| · |n⃗|)
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q4','correct','Korrekt! Für Gerade–Ebene nimmt man sin, weil der Winkel zur Ebene das Komplement des Winkels zum Normalenvektor ist.')">
+            <span class="option-letter">B</span> sin(β) = |b⃗ · n⃗| / (|b⃗| · |n⃗|)
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q4','wrong','tan kommt in diesen Winkelformeln nicht vor.')">
+            <span class="option-letter">C</span> tan(β) = |b⃗ · n⃗| / (|b⃗| · |n⃗|)
+          </button>
+          <button class="quiz-option" onclick="answer(this,'q4','wrong','Man braucht den Normalenvektor der Ebene, nicht ihrer Richtungsvektoren.')">
+            <span class="option-letter">D</span> cos(α) = |b⃗ · u⃗| / (|b⃗| · |u⃗|)
+          </button>
+        </div>
+        <div class="quiz-feedback" id="q4-fb"></div>
+        <button class="quiz-reset" id="q4-reset" onclick="resetQuiz('q4')">↺ Nochmal versuchen</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 8. KOMPETENZEN ─── -->
+  <div class="section" id="kompetenzen">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-icon" style="background:rgba(251,146,60,0.1)">🎯</div>
+      <div class="section-title">
+        <h2>Kompetenzen im Überblick</h2>
+        <p>Was du am Ende des Unterrichtsvorhabens können sollst</p>
+      </div>
+      <div class="section-chevron">⌄</div>
+    </div>
+    <div class="section-body">
+
+      <p style="margin-bottom:1rem;">Diese Kompetenzen stammen aus dem NRW-Kernlehrplan GK (Analytische Geometrie):</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">●</div>
+          <div class="step-content">Ich kann Ebenen in <strong>Parameterform</strong> und in <strong>Koordinatenform</strong> darstellen.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">●</div>
+          <div class="step-content">Ich kann <strong>Koordinatenformen</strong> von Ebenen zur Orientierung im Raum nutzen (Punktprobe, Schnittpunkte mit den Koordinatenachsen, Normalenvektor).</div>
+        </div>
+        <div class="step">
+          <div class="step-num">●</div>
+          <div class="step-content">Ich kann <strong>Schnittpunkte von Geraden mit Ebenen</strong> berechnen.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">●</div>
+          <div class="step-content">Ich kann die <strong>Größe des Schnittwinkels</strong> zwischen zwei sich schneidenden Objekten berechnen.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">●</div>
+          <div class="step-content">Ich kann <strong>lineare Gleichungssysteme</strong> als Lösungsverfahren erläutern und auf einfache Systeme anwenden.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">●</div>
+          <div class="step-content">Ich kann geometrische Objekte und Situationen in <strong>inner- und anwendungsbezogenen Problemstellungen</strong> untersuchen und die Ergebnisse deuten.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="info-box">
+        <div class="info-box-title">📚 Vorkenntnisse, die ich brauche</div>
+        <div class="tags" style="margin-top:0.4rem">
+          <span class="tag">Vektoren</span>
+          <span class="tag green">Geraden im Raum</span>
+          <span class="tag purple">Lagebeziehungen Geraden</span>
+          <span class="tag orange">Skalarprodukt</span>
+          <span class="tag">Winkel zwischen Vektoren</span>
+        </div>
+      </div>
+
+      <div class="info-box tip">
+        <div class="info-box-title">✨ Tipp für die Klausur</div>
+        Lerne die drei Formeln auswendig: <strong>Parameterform</strong>, <strong>Kreuzprodukt</strong> und <strong>Winkelformeln</strong>. Alles andere lässt sich daraus herleiten!
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ─── SECTION TOGGLE ───
+function toggleSection(header) {
+  const section = header.parentElement;
+  section.classList.toggle('open');
+}
+
+// ─── MINI ACCORDION ───
+function toggleMini(header) {
+  const accord = header.parentElement;
+  accord.classList.toggle('open');
+  const arrow = header.querySelector('span');
+  if (arrow) arrow.textContent = accord.classList.contains('open') ? '▾' : '▸';
+}
+
+// ─── CHECKLIST ───
+function toggleCheck(label) {
+  label.classList.toggle('checked');
+  updateTracker();
+}
+
+function updateTracker() {
+  const items = document.querySelectorAll('.check-item');
+  const checked = document.querySelectorAll('.check-item.checked').length;
+  const pct = (checked / items.length) * 100;
+  document.getElementById('tracker-fill').style.width = pct + '%';
+  document.getElementById('tracker-count').textContent =
+    checked + ' von ' + items.length + ' Kompetenzen abgehakt';
+}
+
+// ─── QUIZ ───
+function answer(btn, qid, result, explanation) {
+  const container = document.getElementById(qid);
+  const btns = container.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.classList.add('disabled'));
+  btn.classList.add(result);
+
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (result === 'correct' ? '✅ ' : '❌ ') + explanation;
+  fb.className = 'quiz-feedback show ' + result;
+
+  const resetBtn = document.getElementById(qid + '-reset');
+  resetBtn.classList.add('show');
+}
+
+function resetQuiz(qid) {
+  const container = document.getElementById(qid);
+  const btns = container.querySelectorAll('.quiz-option');
+  btns.forEach(b => {
+    b.classList.remove('correct', 'wrong', 'disabled');
+  });
+  const fb = document.getElementById(qid + '-fb');
+  fb.className = 'quiz-feedback';
+  const resetBtn = document.getElementById(qid + '-reset');
+  resetBtn.classList.remove('show');
+}
+
+// ─── PROGRESS BAR ON SCROLL ───
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const scrollTop = doc.scrollTop || document.body.scrollTop;
+  const scrollHeight = doc.scrollHeight - doc.clientHeight;
+  const pct = (scrollTop / scrollHeight) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// ─── NAV ACTIVE STATE ───
+const navPills = document.querySelectorAll('.nav-pill');
+navPills.forEach(pill => {
+  pill.addEventListener('click', function() {
+    navPills.forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ─── INTERSECTION OBSERVER for section animations ───
+const sections = document.querySelectorAll('.section');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08 });
+
+sections.forEach(s => observer.observe(s));
+
+// Open first section on load
+document.querySelectorAll('.section')[0].classList.add('open');
+</script>
+
+</body>
+</html>
